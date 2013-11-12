@@ -1,9 +1,13 @@
 var express = require('express')
   , cons = require('consolidate')
   , swig = require('swig')
+  , passport = require('passport')  
+  , LocalStrategy = require('passport-local').Strategy
+  , flash = require('connect-flash')
   , app = express()
   , http = require('http')
   , fs = require('fs')
+  , mysql = require('mysql')
   , server = http.createServer(app)
   , sys = require('sys')
   , path = require('path')
@@ -21,6 +25,9 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.cookieParser('your secret here'));
   app.use(express.session());
+  app.use(flash());
+  app.use(passport.initialize());
+  app.use(passport.session());
   app.use(app.router);
   app.use(require('less-middleware')({ src: __dirname + '/public' }));
   app.use(express.static(path.join(__dirname, 'public')));
@@ -36,7 +43,9 @@ var global_vars = {
   copyright_year: '2013'
 }
 
+eval(fs.readFileSync('./auth.js')+'');
 eval(fs.readFileSync('./routes.js')+'');
+eval(fs.readFileSync('./settings.js')+'');
 
 server.listen(global_vars.listening_port);
 console.log('listening on port ' + global_vars.listening_port);
